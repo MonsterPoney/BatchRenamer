@@ -1,2 +1,2 @@
 # BatchRenamer
-Console app to rename files or directories
+Permit to batch rename folders or files
