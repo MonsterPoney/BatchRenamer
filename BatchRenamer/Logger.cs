@@ -18,7 +18,7 @@ namespace BatchRenamer {
             }
 
             logName = nomFic;
-            System.IO.File.WriteAllText(logName, $"##### {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} - {logTitle} #####{Environment.NewLine}");
+            System.IO.File.WriteAllText(logName, $"-_-_-_- {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")} - {logTitle} -_-_-_-{Environment.NewLine}");
         }
 
         public void WriteLog(string msg, string msgException = null) {

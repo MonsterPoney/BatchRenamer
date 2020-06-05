@@ -1,0 +1,7 @@
+F:\git_repo\BatchRenamer\BatchRenamer\bin\Release\BatchRenamer.exe.config
+F:\git_repo\BatchRenamer\BatchRenamer\bin\Release\BatchRenamer.exe
+F:\git_repo\BatchRenamer\BatchRenamer\bin\Release\BatchRenamer.pdb
+F:\git_repo\BatchRenamer\BatchRenamer\obj\Release\BatchRenamer.csprojAssemblyReference.cache
+F:\git_repo\BatchRenamer\BatchRenamer\obj\Release\BatchRenamer.csproj.CoreCompileInputs.cache
+F:\git_repo\BatchRenamer\BatchRenamer\obj\Release\BatchRenamer.exe
+F:\git_repo\BatchRenamer\BatchRenamer\obj\Release\BatchRenamer.pdb
