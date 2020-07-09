@@ -1,0 +1,81 @@
+﻿<xml>
+  <logFileError>log File cannot be properly named, logPath must finish by '\' in config.ini</logFileError>
+  <pathExemple>Path (Ex : M:\Documents\Renomage) : </pathExemple>
+  <pathError>The following path does not exists : </pathError>
+  <type>
+    Type of document to rename :
+    1 - File
+    2 - Folder</type>
+  <docExtension>
+    Documents extension :
+    Ex : .png || .txt || .pdf || etc...</docExtension>
+  <noMatch>No matching documents found</noMatch>
+  <mode>1 - Wizard (simple)
+2 - One line command (!Warning)
+  </mode>
+  <reminder>Reminder :
+    1- Adding characters
+    Parameter: One or more characters
+    Option 1 : At the beginning of the chain
+    Option 2 : At the end of the chain
+
+    2- Deletion of characters
+    Parameter: One or more characters
+
+    3- Deletion of numbers
+
+    4- Characters replacement
+    Parameter: old char(s) and new char(s)
+
+    5- Full renaming
+    Parameter: New name
+    Option 1 : Differentiate names by number at the beginning of the chain
+    Option 2 :Differentiate names by number at the end of the chain
+
+    6- Upper/lower case
+    Option 1 : All upper case
+    Option 2 : All lower case
+    Option 3 : First letter upper case
+
+    7- Extension replacement
+    / !\ Obviously not available for folders / !\
+    Parameter : new extension
+    
+    Ex :  3|1:exa:2|4:-;__   Delete numbers then add 'exa' at the end of the chain then replace '-' by '__'
+    Syntax : ':' between variables and '|' between each command
+    !!! Warning : Be sure about your command line, the process will continue until the end without asking validation !!!
+  </reminder>
+  <validation>Last validation, are you sure to continue ? (Y/N)</validation>
+  <modifications>Modifications :
+    1 - Adding characters
+    2 - Deletion of characters
+    3 - Deletion of numbers
+    4 - Characters replacement
+    5 - Full renaming
+    6 - Upper/Lower case
+    7 - Extension replacement
+  </modifications>
+  <case1.1>Characters to add : </case1.1>
+  <case1.2>
+    1 - At the beginning of the chain
+    2 - At the end of the chain
+  </case1.2>
+  <case2.1>Characters to delete : </case2.1>
+
+  <case4.1>
+    Syntax : [avant];[apres] || Ex : _;-
+  </case4.1>
+  <case5.1>New name :</case5.1>
+  <case5.2>
+
+    Différentiates names by :
+    1 - Number at the beginning of the chain
+    2 - Number at the end of the chain
+  </case5.2>
+  <case6.1>
+    1 - All upper case
+    2 - All lower case
+    3 - First letter upper case
+  </case6.1>
+  <case7.1>No extension change on a folder</case7.1>
+</xml>
