@@ -1,0 +1,143 @@
+﻿<xml>
+  <logFileError>Le fichier log ne peut pas être correctement nommé, 'logPath' doit finir par '\' dans config.ini</logFileError>
+  <pathExemple>Chemin (Ex : M:\Documents\Renomage) : </pathExemple>
+  <pathError>Le chemin d'accès suivant n'existe pas : {0}</pathError>
+  <type>
+    Type de document a renommer :
+    1 - Fichier
+    2 - Dossier</type>
+  <docExtension>
+    Extension du document :
+    Ex : .png || .txt || .pdf || etc...</docExtension>
+  <noMatch>Aucun document correspondant trouvé</noMatch>
+  <mode>1 - Pas à pas (simple)
+    2 - Une ligne de commande (!Avancé)</mode>
+  <reminder>
+    Rappel :
+    1- Ajout de caractères
+    Parametre: Un ou plusieurs caractères
+    Option 1 : En début de chaine
+    Option 2 : En fin de chaine
+
+    2- Suppression de caractères
+    Parametre: Un ou plusieurs caractères
+
+    3- Suppression de chiffres
+
+    4- Remplacement de caractères
+    Parametre: ancien(s) caractère(s) et nouveaux
+
+    5- Renommage complet
+    Parametre: Nouveau nom
+    Option 1 : Différenciation des noms par un nombre en début de chaine
+    Option 2 : Différenciation des noms par un nombre en fin de chaine
+
+    6- Majuscule / Minuscule
+    Option 1 : Tout majuscule
+    Option 2 : Tout minuscule
+    Option 3 : Première lettre majuscule
+
+    7- Remplacement d'extension
+    /!\ Indisponible pour les dossiers /!\
+    Parametre : nouvelle extension
+
+    Ex :  3|1:exa:2|4:-;__   Supprime les chiffres puis ajoute 'exa' en fin de chaine et enfin remplace '-' par '__'
+    Syntaxe : ':' entre les paramètres et '|' entre chaque commande
+    !!! Attention : Soyez sûr des effets de la ligne de commande, le processus continuera jusqu'a la fin sans demander de validation a chaque étape !!!
+  </reminder>
+  <numberOfMatch>
+    Nombre de {0} correspondants : {1}</numberOfMatch>
+  <files>fichiers</files>
+  <folders>dossiers</folders>
+  <validation>Dernière validation, êtes vous sur de continuer ? (Y) Oui, (N) Non</validation>
+  <newName>
+    Nouveau nom : {0}
+  </newName>
+  <caseChange>
+    Changement min / maj
+  </caseChange>
+  <newExten>
+    Nouvelle extention : {0}
+  </newExten>
+  <replaceBy>
+    Remplace {0} par {1}
+  </replaceBy>
+  <removeNum>
+    Supprime les chiffres
+  </removeNum>
+  <removeFromDoc>
+    Supprime {0} du nom
+  </removeFromDoc>
+  <modifications>
+    Modifications :
+    1 - Ajout de caractères
+    2 - Suppression de caractères
+    3 - Suppression de chiffres
+    4 - Remplacement de caractères
+    5 - Renommage complet
+    6 - Majuscule / Minuscule
+    7 - Remplacement d'extension
+  </modifications>
+  <addBegin>
+    Ajoute {0} en début de chaine
+  </addBegin>
+  <addEnd>
+    Ajoute {0} en fin de chaine
+  </addEnd>
+  <case1.1>Caractères à ajouter : </case1.1>
+  <case1.2>
+    1 - En début de chaine
+    2 - En fin de chaine
+  </case1.2>
+  <case2.1>Caractères à supprimer : </case2.1>
+
+  <case4.1>
+    Syntax : &lt;avant&gt;;&lt;après&gt; || Ex : _;-
+  </case4.1>
+  <case5.1>Nouveau nom :</case5.1>
+  <case5.2>
+
+    Différencier les noms par :
+    1 - Un nombre en début de chaine
+    2 - Un nombre en fin de chaine
+  </case5.2>
+  <case6.1>
+    1 : Tout majuscule
+    2 : Tout minuscule
+    3 : Première lettre majuscule
+  </case6.1>
+  <case6.2>
+    Première lettre majuscule
+  </case6.2>
+  <case7.1>Pas de changement d'extension sur un dossier</case7.1>
+  <forbiddenChar>Caractères interdits : ( / \ : * ? \" &lt; &gt; | )</forbiddenChar>
+  <validationFile>
+    ---------------------
+    Validation :
+    Chemin : {0}
+    {1}
+    Extension de fichier : {2}
+    Nombre de documents affectés : {3}
+    (Y) Valider, (N) Recommencer
+  </validationFile>
+  <validationFolder>
+    ---------------------
+    Validation :
+    Chemin : {0}
+    {1}
+    Type : dossier
+    Nombre de documents affectés : {2}
+    (Y) Valider, (N) Recommencer
+  </validationFolder>
+  <existingFileError>Impossible de crée un fichier existant : {0} en {1}</existingFileError>
+  <end>
+    Fin de programme
+  </end>
+  <endWarn>
+    Fin de programme, voir les avertissements dans la console
+  </endWarn>
+  <endErr>
+    Fin de programme, voir le log des erreurs dans le dossier : {0}
+  </endErr>
+  <exitRestart>Appuyez sur entrer pour quitter, ou '1' pour recommencer</exitRestart>
+</xml>

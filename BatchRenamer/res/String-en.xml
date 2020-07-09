@@ -1,0 +1,143 @@
+﻿<xml>
+  <logFileError>log File cannot be properly named, 'logPath' must finish by '\' in config.ini</logFileError>
+  <pathExemple>Path (Ex : M:\Documents\Renomage) : </pathExemple>
+  <pathError>The following path does not exists : {0}</pathError>
+  <type>
+    Type of document to rename :
+    1 - File
+    2 - Folder</type>
+  <docExtension>
+    Documents extension :
+    Ex : .png || .txt || .pdf || etc...</docExtension>
+  <noMatch>No matching documents found</noMatch>
+  <mode>1 - Step by step (simple)
+    2 - One line command (!Warning)</mode>
+  <reminder>
+    Reminder :
+    1- Adding characters
+    Parameter: One or more characters
+    Option 1 : At the beginning of the chain
+    Option 2 : At the end of the chain
+
+    2- Deletion of characters
+    Parameter: One or more characters
+
+    3- Deletion of numbers
+
+    4- Characters replacement
+    Parameter: old char(s) and new char(s)
+
+    5- Full renaming
+    Parameter: New name
+    Option 1 : Differentiate names by number at the beginning of the chain
+    Option 2 : Differentiate names by number at the end of the chain
+
+    6- Upper/lower case
+    Option 1 : All upper case
+    Option 2 : All lower case
+    Option 3 : First letter upper case
+
+    7- Extension replacement
+    /!\ Obviously not available for folders /!\
+    Parameter : new extension
+
+    Ex :  3|1:exa:2|4:-;__   Delete numbers then, add 'exa' at the end of the chain then, replace '-' by '__'
+    Syntax : ':' between parameters and '|' between each command
+    !!! Warning : Be sure about your command line, the process will continue until the end without asking validation at each step !!!
+  </reminder>
+  <numberOfMatch>
+    Number of {0} matching : {1}</numberOfMatch>
+  <files>files</files>
+  <folders>folders</folders>
+  <validation>Last validation, are you sure to continue ? (Y/N)</validation>
+  <newName>
+    New name : {0}
+  </newName>
+  <caseChange>
+    Case change
+  </caseChange>
+  <newExten>
+    New extension : {0}
+  </newExten>
+  <replaceBy>
+    Replace {0} by {1}
+  </replaceBy>
+  <removeNum>
+    Remove numbers
+  </removeNum>
+  <removeFromDoc>
+    Remove {0} from documents name
+  </removeFromDoc>
+  <modifications>
+    Modifications :
+    1 - Adding characters
+    2 - Deletion of characters
+    3 - Deletion of numbers
+    4 - Characters replacement
+    5 - Full renaming
+    6 - Upper/Lower case
+    7 - Extension replacement
+  </modifications>
+  <addBegin>
+    Add {0} at the beginning of the chain
+  </addBegin>
+  <addEnd>
+    Add {0} at the end of the chain
+  </addEnd>
+  <case1.1>Characters to add : </case1.1>
+  <case1.2>
+    1 - At the beginning of the chain
+    2 - At the end of the chain
+  </case1.2>
+  <case2.1>Characters to delete : </case2.1>
+
+  <case4.1>
+    Syntax : &lt;before&gt;;&lt;after&gt; || Ex : _;-
+  </case4.1>
+  <case5.1>New name :</case5.1>
+  <case5.2>
+
+    Différentiates names by :
+    1 - Number at the beginning of the chain
+    2 - Number at the end of the chain
+  </case5.2>
+  <case6.1>
+    1 - All upper case
+    2 - All lower case
+    3 - First letter upper case
+  </case6.1>
+  <case6.2>
+    First letter upper case
+  </case6.2>
+  <case7.1>No extension change on a folder</case7.1>
+  <forbiddenChar>Forbidden characters ( / \ : * ? \" &lt; &gt; | )</forbiddenChar>
+  <validationFile>
+    ---------------------
+    Validation :
+    Path : {0}
+    {1}
+    File extension : {2}
+    Number of documents affected : {3}
+    (Y) Validate, (N) Restart
+  </validationFile>
+  <validationFolder>
+    ---------------------
+    Validation :
+    Path : {0}
+    {1}
+    Type : folder
+    Number of documents affected : {2}
+    (Y) Validate, (N) Restart
+  </validationFolder>
+  <existingFileError>Impossible to create an existing file : {0} to {1}</existingFileError>
+  <end>
+    End of program
+  </end>
+  <endWarn>
+    End of program, see warnings in the console
+  </endWarn>
+  <endErr>
+    End of program, see errors log in the folder : {0}
+  </endErr>
+  <exitRestart>Press enter to exit, or '1' to restart</exitRestart>
+</xml>

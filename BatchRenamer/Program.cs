@@ -12,23 +12,21 @@ namespace BatchRenamer {
         public static string logPath = ini.ReadKey("main", "logPath") ?? "\\.";
         static readonly Logger log = new Logger(logPath, "");
         static bool isWarning = false;
+        static XmlDocument res;
         static string lang = (System.Globalization.CultureInfo.CurrentUICulture.ToString().Substring(0, 2) == "fr") ? "fr" : "en";
         static string incorValue = (lang == "fr") ? "Valeur incorrecte" : "Incorrect value";
 
         static void Main() {
 
-            XmlDocument res = new XmlDocument();
-#if RELEASE
+            res = new XmlDocument();
             res.Load($@"{Environment.CurrentDirectory}\res\String-{lang}.xml");
-#endif
-            res.Load($@"{Environment.CurrentDirectory}\res\String-en.xml");
 
             SetConsoleCtrlHandler(new HandlerRoutine(ConsoleCtrlCheck), true);
 
             if (logPath[logPath.Length - 1] != '\\') {
                 Console.BackgroundColor = ConsoleColor.Yellow;
                 Console.ForegroundColor = ConsoleColor.Black;
-                Console.WriteLine(res.SelectSingleNode("/xml/logFileError").InnerText);
+                Console.WriteLine(res.Get("logFileError"));
                 Console.ResetColor();
             }
 
@@ -43,11 +41,11 @@ namespace BatchRenamer {
 
                 try {
                     tagPath:
-                    Console.WriteLine(res.SelectSingleNode("/xml/pathExemple").InnerText);
+                    Console.WriteLine(res.Get("pathExemple"));
                     path = Console.ReadLine();
 
                     if (!Directory.Exists(path)) {
-                        Console.WriteLine(res.SelectSingleNode("/xml/pathError").InnerText + path);
+                        Console.WriteLine(String.Format(res.Get("pathError")),path);
                         goto tagPath;
                     }
                 }
@@ -57,7 +55,7 @@ namespace BatchRenamer {
 
                 try {
                     tagType:
-                    Console.WriteLine(res.SelectSingleNode("xml/type").InnerText);
+                    Console.WriteLine(res.Get("type"));
                     type = int.Parse(Console.ReadLine());
 
                     if (type < 1 || type > 2) {
@@ -71,7 +69,7 @@ namespace BatchRenamer {
 
                 try {
                     if (type == 1) {
-                        Console.WriteLine(res.SelectSingleNode("xml/docExtension").InnerText);
+                        Console.WriteLine(res.Get("docExtension"));
                         extension = Console.ReadLine();
 
                         if (!extension.StartsWith("."))
@@ -81,9 +79,9 @@ namespace BatchRenamer {
                     } else
                         fileSet = Directory.GetDirectories(path).ToHashSet();
                     if (fileSet.Count == 0) {
-                        Console.WriteLine(res.SelectSingleNode("xml/noMatch").InnerText);
+                        Console.WriteLine(res.Get("noMatch"));
                     }
-                    Console.WriteLine($"\nNumber of {((type == 1) ? "files" : "folder")} matching : {fileSet.Count}");
+                    Console.WriteLine(String.Format(res.Get("numberOfMatch"), ((type == 1) ? res.Get("files") : res.Get("folders")),fileSet.Count));
                 }
                 catch (Exception e) {
                     log.WriteLog("E : Exception extension : ", e.Message);
@@ -91,21 +89,21 @@ namespace BatchRenamer {
 
                 // : entre param |entre cmd
                 tagMode:
-                Console.WriteLine(res.SelectSingleNode("xml/mode").InnerText);
+                Console.WriteLine(res.Get("mode"));
                 choice = int.Parse(Console.ReadLine());
                 if (choice < 1 || choice > 2) {
                     Console.WriteLine(incorValue);
                     goto tagMode;
                 }
                 if (choice == 2) {
-                    Console.WriteLine(res.SelectSingleNode("xml/reminder").InnerText);
+                    Console.WriteLine(res.Get("reminder"));
                     command = Console.ReadLine();
                     commands = command.Split('|');
                     Console.WriteLine($"{commands.Length} commands : ");
                     foreach (string cmd in commands)
                         Console.WriteLine($"\n{cmd}");
                     tagValidationCMD:
-                    Console.WriteLine(res.SelectSingleNode("xml/validation").InnerText);
+                    Console.WriteLine(res.Get("validation"));
                     string valid = Console.ReadLine().ToUpper();
                     if (valid == "N")
                         goto tagStart;
@@ -122,7 +120,7 @@ namespace BatchRenamer {
 
                 try {
                     tagModif:
-                    Console.WriteLine(res.SelectSingleNode("xml/modifications").InnerText);
+                    Console.WriteLine(res.Get("modifications"));
                     modification = int.Parse(Console.ReadLine());
 
                     if (modification < 1 || modification > 7) {
@@ -139,11 +137,11 @@ namespace BatchRenamer {
                     case 1:
                         try {
                             tagCase1:
-                            Console.WriteLine(res.SelectSingleNode("xml/case1.1"));
+                            Console.WriteLine(res.Get("case1.1"));
                             line = Console.ReadLine();
                             if (!ValidLine(line))
                                 goto tagCase1;
-                            Console.WriteLine(res.SelectSingleNode("xml/case1.2"));
+                            Console.WriteLine(res.Get("case1.2"));
                             choice = int.Parse(Console.ReadLine());
 
                             if (choice != 1 && choice != 2) {
@@ -152,7 +150,7 @@ namespace BatchRenamer {
                             }
 
                             tagValidation1:
-                            GeneValidation(path, $"Add {line} {((choice == 1) ? "at the beginning of the chain\n" : "at the end of the chain\n")}", type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format((choice == 1) ? res.Get("addBegin") : res.Get("addEnd"), line), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
@@ -172,13 +170,13 @@ namespace BatchRenamer {
                     case 2:
                         try {
                             tagCase2:
-                            Console.WriteLine(res.SelectSingleNode("xml/case2.1"));
+                            Console.WriteLine(res.Get("case2.1"));
                             line = Console.ReadLine();
                             if (!ValidLine(line))
                                 goto tagCase2;
                             fileSet.RemoveWhere(f => !f.Split('\\').Last().Contains(line));
                             tagValidation2:
-                            GeneValidation(path, $"Remove {line} from documents name\n", type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("removeFromDoc"),line), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
@@ -199,7 +197,7 @@ namespace BatchRenamer {
                         try {
                             fileSet.RemoveWhere(f => !f.Split('\\').Last().Any(char.IsDigit));
                             tagValidation3:
-                            GeneValidation(path, $"Remove numbers\n", type, extension, fileSet.Count);
+                            GeneValidation(path, res.Get("removeNum"), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
@@ -219,7 +217,7 @@ namespace BatchRenamer {
                     case 4:
                         try {
                             tagCase4:
-                            Console.WriteLine(res.SelectSingleNode("xml/case4.1"));
+                            Console.WriteLine(res.Get("case4.1"));
                             line = Console.ReadLine();
                             if (!ValidLine(line))
                                 goto tagCase4;
@@ -227,7 +225,7 @@ namespace BatchRenamer {
                             string newChar = line.Split(';')[1];
                             fileSet.RemoveWhere(f => !f.Split('\\').Last().Contains(oldChar));
                             tagValidation4:
-                            GeneValidation(path, $"Replace {oldChar} by {newChar}\n", type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("replaceBy"),oldChar,newChar), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
@@ -247,11 +245,11 @@ namespace BatchRenamer {
                     case 5:
                         try {
                             tagCase5:
-                            Console.WriteLine(res.SelectSingleNode("xml/case5.1"));
+                            Console.WriteLine(res.Get("case5.1"));
                             line = Console.ReadLine();
                             if (!ValidLine(line))
                                 goto tagCase5;
-                            Console.WriteLine(res.SelectSingleNode("xml/case5.2"));
+                            Console.WriteLine(res.Get("case5.2"));
                             choice = int.Parse(Console.ReadLine());
 
                             if (choice != 1 && choice != 2) {
@@ -260,7 +258,7 @@ namespace BatchRenamer {
                             }
 
                             tagValidation5:
-                            GeneValidation(path, $"New name : {line}\n", type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("newName"),line), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
@@ -280,15 +278,16 @@ namespace BatchRenamer {
                     case 6:
                         try {
                             tagCase6:
-                            Console.WriteLine(res.SelectSingleNode("xml/case6.1"));
+                            Console.WriteLine(res.Get("case6.1"));
                             choice = int.Parse(Console.ReadLine());
 
                             if (choice < 1 || choice > 3) {
                                 Console.WriteLine(incorValue);
                                 goto tagCase6;
                             } else if (choice == 3) {
+                                // First letter upper
                                 tagValidation6b:
-                                GeneValidation(path, "First letter upper case \n", type, extension, fileSet.Count);
+                                GeneValidation(path, res.Get("case6.2"), type, extension, fileSet.Count);
                                 input = Console.ReadLine().ToUpper();
                                 if (input == "N")
                                     goto tagStart;
@@ -300,7 +299,7 @@ namespace BatchRenamer {
                                 }
                             } else {
                                 tagValidation6:
-                                GeneValidation(path, "case change\n", type, extension, fileSet.Count);
+                                GeneValidation(path, res.Get("caseChange"), type, extension, fileSet.Count);
                                 input = Console.ReadLine().ToUpper();
                                 if (input == "N")
                                     goto tagStart;
@@ -322,11 +321,11 @@ namespace BatchRenamer {
                     case 7:
                         try {
                             if (type != 1) {
-                                Console.WriteLine(res.SelectSingleNode("xml/case7.1"));
+                                Console.WriteLine(res.Get("case7.1"));
                                 goto tagStart;
                             }
                             tagCase7:
-                            Console.WriteLine("New extension : ");
+                            Console.WriteLine(res.Get("newExten"));
                             line = Console.ReadLine();
                             if (!ValidLine(line))
                                 goto tagCase7;
@@ -334,7 +333,7 @@ namespace BatchRenamer {
                                 line = "." + line;
 
                             tagValidation7:
-                            GeneValidation(path, $"New extension : {line}\n", type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("newExten"),line), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
@@ -367,7 +366,7 @@ namespace BatchRenamer {
                     _line = _cmd.Split(':')[1];
                     _choice = int.Parse(_cmd.Split(':')[2]);
                 }
-                catch (IndexOutOfRangeException outRange) {
+                catch (IndexOutOfRangeException _) {
 
                 }
 
@@ -594,12 +593,12 @@ namespace BatchRenamer {
 
                 string lower = _line.ToLower();
                 if (lower == "con" || lower == "aux" || lower == "prn" || lower == "lst" || lower == "nul") {
-                    Console.WriteLine("Forbidden characters ( / \\ : * ? \" < > | )"); // \
+                    Console.WriteLine(res.Get("forbiddenChar")); 
                     return false;
                 }
                 for (int i = 0; i <= 9; i++) {
                     if (lower == $"com{i}" || lower == $"lpt{i}") {
-                        Console.WriteLine("Forbidden characters ( / \\ : * ? \" < > | )"); // \
+                        Console.WriteLine(res.Get("forbiddenChar")); 
                         return false;
                     }
                 }
@@ -610,7 +609,7 @@ namespace BatchRenamer {
                 }
                 */
                 if (regex.IsMatch(_line)) {
-                    Console.WriteLine("Forbidden characters ( / \\ : * ? \" < > | )"); // \
+                    Console.WriteLine(res.Get("forbiddenChar"));
                     return false;
                 } else
                     return true;
@@ -618,13 +617,10 @@ namespace BatchRenamer {
 
             // Generate text for verification
             void GeneValidation(string _path, string _custom, int _type, string _extension, int _count) {
-                Console.WriteLine("\n---------------------\n" +
-                    "Validation : \n" +
-                    $"Path : {_path}\n" +
-                    $"{_custom}" +
-                    ((_type == 1) ? $"File extension : {_extension}\n" : "Type : folder\n") +
-                    $"Number of documents affected : {_count}\n" +
-                    "(Y) Validate, (N) Restart");
+                if (_type == 1)
+                    Console.WriteLine(String.Format(res.Get("validationFile"), _path, _custom, _extension, _count));
+                else
+                    Console.WriteLine(String.Format(res.Get("validationFolder"), _path, _custom, _count));
             }
 
             // Write warning --> existing file
@@ -632,8 +628,8 @@ namespace BatchRenamer {
                 isWarning = true;
                 Console.BackgroundColor = ConsoleColor.Yellow;
                 Console.ForegroundColor = ConsoleColor.Black;
-                log.WriteLog($"W: Impossible to create an existing file : {_fileName} en {_finalName} ");
-                Console.WriteLine($"Impossible to create an existing file : {_fileName} en {_finalName}");
+                log.WriteLog($"W: {String.Format(res.Get("existingFileError"),_fileName,_finalName)}");
+                Console.WriteLine(String.Format(res.Get("existingFileError"), _fileName, _finalName));
                 Console.ResetColor();
             }
         }
@@ -642,19 +638,19 @@ namespace BatchRenamer {
             if (isWarning) {
                 Console.BackgroundColor = ConsoleColor.Yellow;
                 Console.ForegroundColor = ConsoleColor.Black;
-                Console.WriteLine("\nEnd of program, see warnings in the console");
+                Console.WriteLine(res.Get("endWarn"));
             } else if (!log.isWritten) {
                 File.Delete(log.logName);
                 Console.BackgroundColor = ConsoleColor.Green;
-                Console.WriteLine("\nEnd of program.");
+                Console.WriteLine(res.Get("end"));
             } else {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine($"\nEnd of program, see logs for errors in the folder : {logPath}");
+                Console.WriteLine(String.Format(res.Get("endErr"),logPath));
             }
             Console.ResetColor();
-            Console.WriteLine("Press enter to exit, or '1' to restart");
-            string line = Console.ReadLine();
-            if (line == "1")
+            Console.WriteLine(res.Get("exitRestart"));
+            char line = Console.ReadKey().KeyChar;
+            if (line == '1')
                 Main();
             else
                 Environment.Exit(0);
@@ -681,9 +677,18 @@ namespace BatchRenamer {
         }
 
         public static bool ConsoleCtrlCheck(CtrlTypes ctrlType) {
-            if(!log.isWritten)
+            if (!log.isWritten)
                 File.Delete(log.logName);
             return true;
+        }
+    }
+
+    /// <summary>
+    /// Return the inner text of a child node of xml tag
+    /// </summary>
+    public static class XmlDocumentExtention {
+        public static string Get(this XmlDocument doc, string nodeName) {
+            return doc.SelectSingleNode($"xml/{nodeName}").InnerText;
         }
     }
 }
