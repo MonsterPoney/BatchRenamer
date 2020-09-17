@@ -10,42 +10,73 @@ namespace BatchRenamer {
     class Program {
         static readonly ConfigFile ini = new ConfigFile($"{Environment.CurrentDirectory}/config.ini");
         public static string logPath = ini.ReadKey("main", "logPath") ?? "\\.";
-        static readonly Logger log = new Logger(logPath, "");
-        static bool isWarning = false;
-        static XmlDocument res;
+        public static Logger log;
+        public static bool isWarning = false;
+        public static XmlDocument res;
         static string lang = (System.Globalization.CultureInfo.CurrentUICulture.ToString().Substring(0, 2) == "fr") ? "fr" : "en";
         static string incorValue = (lang == "fr") ? "Valeur incorrecte" : "Incorrect value";
+        static string path = "";
+        static string input, line, command;
+        static int modification = 0, type = 0, choice;
+        static string extension = "";
+        static string[] commands;
+        static HashSet<string> fileSet;
 
-        static void Main() {
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetConsoleWindow();
+
+        [DllImport("user32.dll")]
+        static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        const int SW_HIDE = 0;
+        const int SW_SHOW = 5;
+
+        static void Main(string[] args) {
+            var handle = GetConsoleWindow();
+            fileSet = new HashSet<string>();
 
             res = new XmlDocument();
             res.Load($@"{Environment.CurrentDirectory}\res\String-{lang}.xml");
 
             SetConsoleCtrlHandler(new HandlerRoutine(ConsoleCtrlCheck), true);
 
-            if (logPath[logPath.Length - 1] != '\\') {
-                Console.BackgroundColor = ConsoleColor.Yellow;
-                Console.ForegroundColor = ConsoleColor.Black;
-                Console.WriteLine(res.Get("logFileError"));
-                Console.ResetColor();
+            if (logPath[logPath.Length - 1] != '\\')
+                logPath += "\\";
+            log = new Logger(logPath, "");
+
+            try {
+                if (args.Length > 0) {
+                    ShowWindow(handle, SW_HIDE);
+                    string[] arguments = string.Join("", args).Split('/');
+                    path = arguments[0];
+                    type = int.Parse(arguments[1]);
+                    extension = arguments[2];
+
+                    fileSet = (type == 1) ? Directory.GetFiles(path, $"*{extension}").ToHashSet() : Directory.GetDirectories(path).ToHashSet();
+                    if (fileSet.Count == 0)
+                        Environment.Exit(18);
+
+                    commands = arguments.Skip(3).ToArray();
+
+                    foreach (string cmd in commands) {
+                        _=new Modification(fileSet, extension, path, type, cmd);
+                    }
+                    Environment.Exit(0);
+                }
+            }catch(Exception e) {
+                log.WriteLog("E : Exception with arguments commands : ",e.Message+e.StackTrace);
             }
 
             try {
                 tagStart:
-                string path = "", input, line, command;
-                int modification = 0, type = 0, choice;
-                string extension = "";
-                string[] commands;
-
-                HashSet<string> fileSet = new HashSet<string>();
-
+             
                 try {
                     tagPath:
                     Console.WriteLine(res.Get("pathExemple"));
                     path = Console.ReadLine();
 
                     if (!Directory.Exists(path)) {
-                        Console.WriteLine(String.Format(res.Get("pathError")),path);
+                        Console.WriteLine(res.Get("pathError"), path);
                         goto tagPath;
                     }
                 }
@@ -73,7 +104,7 @@ namespace BatchRenamer {
                         extension = Console.ReadLine();
 
                         if (!extension.StartsWith("."))
-                            extension = "." + extension;
+                            extension = "." + extension;                      
 
                         fileSet = Directory.GetFiles(path, $"*{extension}").ToHashSet();
                     } else
@@ -81,13 +112,13 @@ namespace BatchRenamer {
                     if (fileSet.Count == 0) {
                         Console.WriteLine(res.Get("noMatch"));
                     }
-                    Console.WriteLine(String.Format(res.Get("numberOfMatch"), ((type == 1) ? res.Get("files") : res.Get("folders")),fileSet.Count));
+                    Console.WriteLine(res.Get("numberOfMatch"), ((type == 1) ? res.Get("files") : res.Get("folders")), fileSet.Count);
                 }
                 catch (Exception e) {
                     log.WriteLog("E : Exception extension : ", e.Message);
                 }
 
-                // : entre param |entre cmd
+                // : entre param / entre cmd
                 tagMode:
                 Console.WriteLine(res.Get("mode"));
                 choice = int.Parse(Console.ReadLine());
@@ -98,7 +129,7 @@ namespace BatchRenamer {
                 if (choice == 2) {
                     Console.WriteLine(res.Get("reminder"));
                     command = Console.ReadLine();
-                    commands = command.Split('|');
+                    commands = command.Split('/');
                     Console.WriteLine($"{commands.Length} commands : ");
                     foreach (string cmd in commands)
                         Console.WriteLine($"\n{cmd}");
@@ -109,7 +140,7 @@ namespace BatchRenamer {
                         goto tagStart;
                     else if (valid == "Y") {
                         foreach (string cmd in commands) {
-                            Modification(fileSet, extension, path, type, cmd);
+                            _= new Modification(fileSet, extension, path, type, cmd);
                         }
                         CloseCons();
                     } else {
@@ -155,7 +186,7 @@ namespace BatchRenamer {
                             if (input == "N")
                                 goto tagStart;
                             else if (input == "Y")
-                                Addition(fileSet, type, choice, line, extension);
+                                Modification.Addition(fileSet, type, choice, line, extension);
                             else {
                                 Console.WriteLine(incorValue);
                                 goto tagValidation1;
@@ -176,12 +207,12 @@ namespace BatchRenamer {
                                 goto tagCase2;
                             fileSet.RemoveWhere(f => !f.Split('\\').Last().Contains(line));
                             tagValidation2:
-                            GeneValidation(path, String.Format(res.Get("removeFromDoc"),line), type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("removeFromDoc"), line), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
                             else if (input == "Y")
-                                Supression(fileSet, type, line, extension);
+                                Modification.Supression(fileSet, type, line, extension);
                             else {
                                 Console.WriteLine(incorValue);
                                 goto tagValidation2;
@@ -202,7 +233,7 @@ namespace BatchRenamer {
                             if (input == "N")
                                 goto tagStart;
                             else if (input == "Y")
-                                DeleteNumbers(fileSet, type, extension);
+                                Modification.DeleteNumbers(fileSet, type, extension);
                             else {
                                 Console.WriteLine(incorValue);
                                 goto tagValidation3;
@@ -225,12 +256,12 @@ namespace BatchRenamer {
                             string newChar = line.Split(';')[1];
                             fileSet.RemoveWhere(f => !f.Split('\\').Last().Contains(oldChar));
                             tagValidation4:
-                            GeneValidation(path, String.Format(res.Get("replaceBy"),oldChar,newChar), type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("replaceBy"), oldChar, newChar), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
                             else if (input == "Y")
-                                Replace(fileSet, type, line, extension);
+                                Modification.Replace(fileSet, type, line, extension);
                             else {
                                 Console.WriteLine(incorValue);
                                 goto tagValidation4;
@@ -258,12 +289,12 @@ namespace BatchRenamer {
                             }
 
                             tagValidation5:
-                            GeneValidation(path, String.Format(res.Get("newName"),line), type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("newName"), line), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
                             else if (input == "Y")
-                                Rename(fileSet, type, choice, line, extension);
+                                Modification.Rename(fileSet, type, choice, line, extension);
                             else {
                                 Console.WriteLine(incorValue);
                                 goto tagValidation5;
@@ -292,7 +323,7 @@ namespace BatchRenamer {
                                 if (input == "N")
                                     goto tagStart;
                                 else if (input == "Y")
-                                    CaseChange(fileSet, type, choice, extension);
+                                    Modification.CaseChange(fileSet, type, choice, extension);
                                 else {
                                     Console.WriteLine(incorValue);
                                     goto tagValidation6b;
@@ -304,7 +335,7 @@ namespace BatchRenamer {
                                 if (input == "N")
                                     goto tagStart;
                                 else if (input == "Y")
-                                    CaseChange(fileSet, type, choice, extension);
+                                    Modification.CaseChange(fileSet, type, choice, extension);
                                 else {
                                     Console.WriteLine(incorValue);
                                     goto tagValidation6;
@@ -325,7 +356,7 @@ namespace BatchRenamer {
                                 goto tagStart;
                             }
                             tagCase7:
-                            Console.WriteLine(res.Get("newExten"));
+                            Console.WriteLine(res.Get("newExten"),"");
                             line = Console.ReadLine();
                             if (!ValidLine(line))
                                 goto tagCase7;
@@ -333,12 +364,12 @@ namespace BatchRenamer {
                                 line = "." + line;
 
                             tagValidation7:
-                            GeneValidation(path, String.Format(res.Get("newExten"),line), type, extension, fileSet.Count);
+                            GeneValidation(path, String.Format(res.Get("newExten"), line), type, extension, fileSet.Count);
                             input = Console.ReadLine().ToUpper();
                             if (input == "N")
                                 goto tagStart;
                             else if (input == "Y")
-                                ExtensionChange(fileSet, line);
+                                Modification.ExtensionChange(fileSet, line);
                             else {
                                 Console.WriteLine(incorValue);
                                 goto tagValidation7;
@@ -353,261 +384,26 @@ namespace BatchRenamer {
                 CloseCons();
             }
             catch (Exception e) {
-                log.WriteLog("E : General exception : ", e.Message + e.StackTrace);
+                log.WriteLog("E : General exception : ",e.GetType()+ e.Message + e.StackTrace+e.InnerException);
             }
 
-
-            void Modification(HashSet<string> _fileSet, string _extension, string _path, int _type, string _cmd) {
-                int _modif = 0;
-                string _line = "";
-                int _choice = 0;
-                try {
-                    _modif = int.Parse(_cmd.Split(':')[0]);
-                    _line = _cmd.Split(':')[1];
-                    _choice = int.Parse(_cmd.Split(':')[2]);
-                }
-                catch (IndexOutOfRangeException _) {
-
-                }
-
-                if (_type == 1) {
-                    _fileSet = Directory.GetFiles(_path, $"*{_extension}").ToHashSet();
-                } else
-                    _fileSet = Directory.GetDirectories(_path).ToHashSet();
-                if (_fileSet.Count == 0) {
-                    CloseCons();
-                }
-
-                switch (_modif) {
-                    case 1:
-                        Addition(_fileSet, _type, _choice, _line, _extension);
-                        break;
-
-                    case 2:
-                        Supression(_fileSet, _type, _line, _extension);
-                        break;
-
-                    case 3:
-                        DeleteNumbers(_fileSet, _type, _extension);
-                        break;
-
-                    case 4:
-                        Replace(_fileSet, _type, _line, _extension);
-                        break;
-
-                    case 5:
-                        Rename(_fileSet, _type, _choice, _line, _extension);
-                        break;
-
-                    case 6:
-                        CaseChange(_fileSet, _type, int.Parse(_line), _extension);
-                        break;
-
-                    case 7:
-                        ExtensionChange(_fileSet, _line);
-                        break;
-                }
-            }
-
-            void Addition(HashSet<string> _fileSet, int _type, int _choice, string _line, string _extension) {
-                try {
-                    foreach (var file in _fileSet) {
-                        if (_type == 1) {
-                            string name = Directory.GetParent(file) + @"\" + ((_choice == 1) ? _line + Path.GetFileNameWithoutExtension(file) : Path.GetFileNameWithoutExtension(file) + _line) + _extension;
-                            MoveIfNotExists(true, file, name);
-                        } else {
-                            string name = Directory.GetParent(file) + @"\" + ((_choice == 1) ? _line + file.Split('\\').Last() : file.Split('\\').Last() + _line);
-                            MoveIfNotExists(false, file, name);
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    log.WriteLog("E : Exception Addition() : ", e.Message);
-                }
-            }
-
-            void Supression(HashSet<string> _fileSet, int _type, string _line, string _extension) {
-                try {
-                    _fileSet.RemoveWhere(f => !f.Split('\\').Last().Contains(_line));
-                    foreach (var file in _fileSet) {
-                        if (_type == 1) {
-                            string name = Directory.GetParent(file) + @"\" + Path.GetFileNameWithoutExtension(file).Replace(_line, "") + _extension;
-                            MoveIfNotExists(true, file, name);
-                        } else {
-                            string name = Directory.GetParent(file) + @"\" + file.Split('\\').Last().Replace(_line, "");
-                            MoveIfNotExists(false, file, name);
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    log.WriteLog("E : Exception Supression() : ", e.Message);
-                }
-            }
-
-            void DeleteNumbers(HashSet<string> _fileSet, int _type, string _extension) {
-                try {
-                    _fileSet.RemoveWhere(f => !f.Split('\\').Last().Any(char.IsDigit));
-                    Regex regexNumber = new Regex(@"[\d-]");
-                    if (_type == 1) {
-                        foreach (var file in _fileSet) {
-                            string name = Directory.GetParent(file) + @"\" + Regex.Replace(Path.GetFileNameWithoutExtension(file), @"[\d]", "") + _extension;
-                            MoveIfNotExists(true, file, name);
-                        }
-                    } else {
-                        foreach (var file in _fileSet) {
-                            string name = Directory.GetParent(file) + @"\" + Regex.Replace(file.Split('\\').Last(), @"[\d]", "");
-                            MoveIfNotExists(false, file, name);
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    log.WriteLog("E : Exception DeleteNumbers() : ", e.Message);
-                }
-            }
-
-            void Replace(HashSet<string> _fileSet, int _type, string _line, string _extension) {
-                try {
-                    string oldChar = _line.Split(';')[0];
-                    string newChar = _line.Split(';')[1];
-                    _fileSet.RemoveWhere(f => !f.Split('\\').Last().Contains(oldChar));
-                    foreach (var file in _fileSet) {
-                        if (_type == 1) {
-                            string name = Directory.GetParent(file) + @"\" + Path.GetFileNameWithoutExtension(file).Replace(oldChar, newChar) + _extension;
-                            MoveIfNotExists(true, file, name);
-                        } else {
-                            string name = Directory.GetParent(file) + @"\" + file.Split('\\').Last().Replace(oldChar, newChar);
-                            MoveIfNotExists(false, file, name);
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    log.WriteLog("E : Exception Replace() : ", e.Message);
-                }
-            }
-
-            void Rename(HashSet<string> _fileSet, int _type, int _choice, string _line, string _extension) {
-                try {
-                    int i = 1;
-                    foreach (var file in _fileSet) {
-                        string name = file;
-                        if (_type == 1) {
-                            // Rename file
-                            name = name.Replace(Path.GetFileNameWithoutExtension(file), (_choice == 1) ? i.ToString() + _line : _line + i.ToString());
-                            MoveIfNotExists(true, file, name);
-                        } else {
-                            // Rename folder
-                            name = Directory.GetParent(file) + @"\" + ((_choice == 1) ? i.ToString() + _line : _line + i.ToString());
-                            MoveIfNotExists(false, file, name);
-                        }
-
-                        i++;
-                    }
-                }
-                catch (Exception e) {
-                    log.WriteLog("E : Exception Rename() : ", e.Message);
-                }
-            }
-
-            void CaseChange(HashSet<string> _fileSet, int _type, int _choice, string _extension) {
-                try {
-                    if (_choice == 3) {
-
-                        if (_type == 1) {
-                            foreach (string file in _fileSet) {
-                                string name = Path.GetFileNameWithoutExtension(file);
-                                string tempName = Directory.GetParent(file) + @"\" + char.ToUpper(name[0]) + name.Substring(1) + "_Temp_" + _extension;
-                                MoveIfNotExists(true, file, tempName);
-                                name = Directory.GetParent(file) + @"\" + char.ToUpper(name[0]) + name.Substring(1) + _extension;
-                                MoveIfNotExists(true, tempName, name);
-                            }
-                        } else {
-                            foreach (string file in _fileSet) {
-                                string name = file.Split('\\').Last();
-                                string tempName = Directory.GetParent(file) + @"\" + char.ToUpper(name[0]) + name.Substring(1) + "_Temp_";
-                                MoveIfNotExists(false, file, tempName);
-                                name = Directory.GetParent(file) + @"\" + char.ToUpper(name[0]) + name.Substring(1);
-                                MoveIfNotExists(false, tempName, name);
-                            }
-
-                        }
-                    } else {
-
-                        if (_type == 1) {
-                            foreach (var file in _fileSet) {
-                                string name = file;
-                                string tempName = Directory.GetParent(file) + @"\" + ((_choice == 1) ? Path.GetFileNameWithoutExtension(file).ToUpper() : Path.GetFileNameWithoutExtension(file).ToLower()) + "_Temp_" + _extension;
-                                MoveIfNotExists(true, file, tempName);
-                                name = Directory.GetParent(file) + @"\" + ((_choice == 1) ? Path.GetFileNameWithoutExtension(file).ToUpper() : Path.GetFileNameWithoutExtension(file).ToLower()) + _extension;
-                                MoveIfNotExists(true, tempName, name);
-                            }
-                        } else {
-                            foreach (var file in _fileSet) {
-                                string name = file;
-                                string tempName = Directory.GetParent(file) + @"\" + ((_choice == 1) ? file.Split('\\').Last().ToUpper() : file.Split('\\').Last().ToLower()) + "_Temp_";
-                                MoveIfNotExists(false, file, tempName);
-                                name = Directory.GetParent(file) + @"\" + ((_choice == 1) ? file.Split('\\').Last().ToUpper() : file.Split('\\').Last().ToLower());
-                                MoveIfNotExists(false, tempName, name);
-                            }
-                        }
-
-                    }
-
-                }
-                catch (Exception e) {
-                    log.WriteLog("E : Exception CaseChange() : ", e.Message);
-                }
-            }
-
-            void ExtensionChange(HashSet<string> _fileSet, string _line) {
-                try {
-                    foreach (var file in _fileSet) {
-                        {
-                            string name = Directory.GetParent(file) + @"\" + Path.GetFileNameWithoutExtension(file) + _line;
-                            MoveIfNotExists(true, file, name);
-                        }
-                    }
-                }
-                catch (Exception e) {
-                    log.WriteLog("E : Exception ExtensionChange() : ", e.Message);
-                }
-            }
-
-            void MoveIfNotExists(bool _isFile, string _file, string _name) {
-                if (_isFile) {
-                    if (File.Exists(_name))
-                        WarningExist(_file.Split('\\').Last(), _name.Split('\\').Last());
-                    else
-                        File.Move(_file, _name);
-                } else {
-                    if (Directory.Exists(_name))
-                        WarningExist(_file.Split('\\').Last(), _name.Split('\\').Last());
-                    else
-                        Directory.Move(_file, _name);
-                }
-            }
 
             // Search for forbidden char
             bool ValidLine(string _line) {
                 var regex = new Regex("^[/\\:*?\"<>|]$");
-                var regexName = new Regex("con|aux|prn|lst|nul|com[0-9]|lpt[0-9]");
 
                 string lower = _line.ToLower();
                 if (lower == "con" || lower == "aux" || lower == "prn" || lower == "lst" || lower == "nul") {
-                    Console.WriteLine(res.Get("forbiddenChar")); 
+                    Console.WriteLine(res.Get("forbiddenChar"));
                     return false;
                 }
                 for (int i = 0; i <= 9; i++) {
                     if (lower == $"com{i}" || lower == $"lpt{i}") {
-                        Console.WriteLine(res.Get("forbiddenChar")); 
+                        Console.WriteLine(res.Get("forbiddenChar"));
                         return false;
                     }
                 }
-                /*
-                if (regexName.IsMatch(_line.ToLower())) {
-                    Console.WriteLine("Forbidden names (con aux prn lst nul com0->com9 lpt0->lpt9)");
-                    return false;
-                }
-                */
+
                 if (regex.IsMatch(_line)) {
                     Console.WriteLine(res.Get("forbiddenChar"));
                     return false;
@@ -618,20 +414,11 @@ namespace BatchRenamer {
             // Generate text for verification
             void GeneValidation(string _path, string _custom, int _type, string _extension, int _count) {
                 if (_type == 1)
-                    Console.WriteLine(String.Format(res.Get("validationFile"), _path, _custom, _extension, _count));
+                    Console.WriteLine(res.Get("validationFile"), _path, _custom, _extension, _count);
                 else
-                    Console.WriteLine(String.Format(res.Get("validationFolder"), _path, _custom, _count));
+                    Console.WriteLine(res.Get("validationFolder"), _path, _custom, _count);
             }
 
-            // Write warning --> existing file
-            void WarningExist(string _fileName, string _finalName) {
-                isWarning = true;
-                Console.BackgroundColor = ConsoleColor.Yellow;
-                Console.ForegroundColor = ConsoleColor.Black;
-                log.WriteLog($"W: {String.Format(res.Get("existingFileError"),_fileName,_finalName)}");
-                Console.WriteLine(String.Format(res.Get("existingFileError"), _fileName, _finalName));
-                Console.ResetColor();
-            }
         }
 
         public static void CloseCons() {
@@ -645,13 +432,13 @@ namespace BatchRenamer {
                 Console.WriteLine(res.Get("end"));
             } else {
                 Console.BackgroundColor = ConsoleColor.Red;
-                Console.WriteLine(String.Format(res.Get("endErr"),logPath));
+                Console.WriteLine(res.Get("endErr"), logPath);
             }
             Console.ResetColor();
             Console.WriteLine(res.Get("exitRestart"));
             char line = Console.ReadKey().KeyChar;
             if (line == '1')
-                Main();
+                Main(new string[] {});
             else
                 Environment.Exit(0);
         }

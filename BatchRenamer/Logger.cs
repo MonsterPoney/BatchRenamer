@@ -30,11 +30,15 @@ namespace BatchRenamer {
                 if (msgException != null) {
                     Console.BackgroundColor = ConsoleColor.Red;
                     Console.ForegroundColor = ConsoleColor.Black;
-                    Console.WriteLine($"Exception !!! logFile directory : {logName}");
+                    if (msgException.Contains("System.FormatException"))
+                        Console.WriteLine("Synthax error can cause this exception");
+                    Console.WriteLine($"Exception !!! logFile : {logName}");
                     Console.ResetColor();
                     sw.WriteLine("___________________________________________________________________________");
                     sw.WriteLine(msgException);
                     sw.WriteLine("___________________________________________________________________________");
+                    Console.WriteLine("Press any key to continue");
+                    Console.ReadKey();
                 }
             }
             isWritten = true;

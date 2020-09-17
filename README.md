@@ -8,9 +8,13 @@ Will guide you through the process and ask for validation.
 
 ### One line command
 One line to make multiple modifications, no validation during process ! Make sure your command line match what you want.
-Syntax : ':' between parameters and '|' between each command.
-	 Ex :  3|1:exa:2|4:-;__
+Syntax : ':' between parameters and '/' between each command.
+	 Ex :  3/1:exa:2/4:-;__
 	 Delete numbers, then add 'exa' at the end of the chain, then replace '-' by '__'.
+
+### External usage with cmd & args
+Each arguments must be separated by '/'.
+	Ex : batchrenamer.exe path/type/extension/command1:parameter1:option1 ...	
 
 ## Features
 ### 1- Adding characters
@@ -28,13 +32,13 @@ Delete all numbers in the name.
 
 ### 4- Characters replacement
 Replace one or more characters by new one(s).
-	Parameter : old char(s) and new char(s)
+	Parameter : old char(s) and new char(s), ‘;‘ to separate them
 	
 ### 5- Full renaming
 Completely rename the files/folders.
 	Parameter : New name
 		Option 1 : Differentiate names by number at the beginning of the chain
-		Option 2 :Differentiate names by number at the end of the chain
+		Option 2 : Differentiate names by number at the end of the chain
 		
 ### 6- Upper/lower case
 	Option 1 : All upper case
@@ -55,9 +59,13 @@ Guide a travers le processus et demande validation.
 
 ### Une ligne de commande
 Une ligne pour effectué de multiples modifications, aucune validation pendant le processus ! Soyez sûr des effets de la ligne de commande.
-Syntaxe : ':' entre les paramètres et '|' entre chaque commande.
-	 Ex :  3|1:exa:2|4:-;__
+Syntaxe : ':' entre les paramètres et '/' entre chaque commande.
+	 Ex :  3/1:exa:2/4:-;__
 	 Supprime les chiffres puis ajoute 'exa' en fin de chaine et enfin remplace '-' par '__'.
+
+### Utilisation externe via cmd et arguments
+Chaque argument doit être séparé par '/'.
+	Ex : batchrenamer.exe path/type/extension/command1:parametre1:option1 ...	
 
 ## Fonctionalités
 ### 1- Ajout de caractères
@@ -75,7 +83,7 @@ Supprime tout les chiffres dans le nom.
 
 ### 4- Remplacement de caractères
 Remplace un ou plusieurs caractères par de nouveaux.
-    Parametre: ancien(s) caractère(s) et nouveaux
+    Parametre: ancien(s) caractère(s) et nouveaux, ‘;‘ pour les séparer
 
 ### 5- Renommage complet
 Renomme complètement le fichier/dossier.

@@ -1,5 +1,4 @@
 ﻿<xml>
-  <logFileError>log File cannot be properly named, 'logPath' must finish by '\' in config.ini</logFileError>
   <pathExemple>Path (Ex : M:\Documents\Renomage) : </pathExemple>
   <pathError>The following path does not exists : {0}</pathError>
   <type>
@@ -10,7 +9,7 @@
     Documents extension :
     Ex : .png || .txt || .pdf || etc...</docExtension>
   <noMatch>No matching documents found</noMatch>
-  <mode>1 - Step by step (simple)
+  <mode>    1 - Step by step (simple)
     2 - One line command (!Warning)</mode>
   <reminder>
     Reminder :
@@ -25,7 +24,7 @@
     3- Deletion of numbers
 
     4- Characters replacement
-    Parameter: old char(s) and new char(s)
+    Parameter: old char(s) and new char(s), ‘;‘ to separate them
 
     5- Full renaming
     Parameter: New name
@@ -41,8 +40,8 @@
     /!\ Obviously not available for folders /!\
     Parameter : new extension
 
-    Ex :  3|1:exa:2|4:-;__   Delete numbers then, add 'exa' at the end of the chain then, replace '-' by '__'
-    Syntax : ':' between parameters and '|' between each command
+    Ex :  3/1:exa:2/4:-;__   Delete numbers then, add 'exa' at the end of the chain then, replace '-' by '__'
+    Syntax : ':' between parameters and '/' between each command
     !!! Warning : Be sure about your command line, the process will continue until the end without asking validation at each step !!!
   </reminder>
   <numberOfMatch>

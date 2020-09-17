@@ -1,5 +1,4 @@
 ﻿<xml>
-  <logFileError>Le fichier log ne peut pas être correctement nommé, 'logPath' doit finir par '\' dans config.ini</logFileError>
   <pathExemple>Chemin (Ex : M:\Documents\Renomage) : </pathExemple>
   <pathError>Le chemin d'accès suivant n'existe pas : {0}</pathError>
   <type>
@@ -10,7 +9,7 @@
     Extension du document :
     Ex : .png || .txt || .pdf || etc...</docExtension>
   <noMatch>Aucun document correspondant trouvé</noMatch>
-  <mode>1 - Pas à pas (simple)
+  <mode>    1 - Pas à pas (simple)
     2 - Une ligne de commande (!Avancé)</mode>
   <reminder>
     Rappel :
@@ -25,7 +24,7 @@
     3- Suppression de chiffres
 
     4- Remplacement de caractères
-    Parametre: ancien(s) caractère(s) et nouveaux
+    Parametre: ancien(s) caractère(s) et nouveaux, ‘;‘ pour les séparer
 
     5- Renommage complet
     Parametre: Nouveau nom
@@ -41,8 +40,8 @@
     /!\ Indisponible pour les dossiers /!\
     Parametre : nouvelle extension
 
-    Ex :  3|1:exa:2|4:-;__   Supprime les chiffres puis ajoute 'exa' en fin de chaine et enfin remplace '-' par '__'
-    Syntaxe : ':' entre les paramètres et '|' entre chaque commande
+    Ex :  3/1:exa:2/4:-;__   Supprime les chiffres puis ajoute 'exa' en fin de chaine et enfin remplace '-' par '__'
+    Syntaxe : ':' entre les paramètres et '/' entre chaque commande
     !!! Attention : Soyez sûr des effets de la ligne de commande, le processus continuera jusqu'a la fin sans demander de validation a chaque étape !!!
   </reminder>
   <numberOfMatch>
