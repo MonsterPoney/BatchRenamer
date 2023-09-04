@@ -72,7 +72,7 @@ namespace BatchRenamer {
                 }
             }
             catch (Exception e) {
-                Program.log.WriteLog("E : Exception Addition() : ", e.Message);
+                Program.log.WriteLog("[E] : Exception Addition() : ", e.Message+e.StackTrace);
             }
         }
 
@@ -90,7 +90,7 @@ namespace BatchRenamer {
                 }
             }
             catch (Exception e) {
-                Program.log.WriteLog("E : Exception Supression() : ", e.Message);
+                Program.log.WriteLog("[E] : Exception Supression() : ", e.Message+e.StackTrace);
             }
         }
 
@@ -111,7 +111,7 @@ namespace BatchRenamer {
                 }
             }
             catch (Exception e) {
-                Program.log.WriteLog("E : Exception DeleteNumbers() : ", e.Message);
+                Program.log.WriteLog("[E] : Exception DeleteNumbers() : ", e.Message+e.StackTrace);
             }
         }
 
@@ -131,7 +131,7 @@ namespace BatchRenamer {
                 }
             }
             catch (Exception e) {
-                Program.log.WriteLog("E : Exception Replace() : ", e.Message);
+                Program.log.WriteLog("[E] : Exception Replace() : ", e.Message+e.StackTrace);
             }
         }
 
@@ -154,7 +154,7 @@ namespace BatchRenamer {
                 }
             }
             catch (Exception e) {
-                Program.log.WriteLog("E : Exception Rename() : ", e.Message);
+                Program.log.WriteLog("[E] : Exception Rename() : ", e.Message+e.StackTrace);
             }
         }
 
@@ -204,7 +204,7 @@ namespace BatchRenamer {
 
             }
             catch (Exception e) {
-                Program.log.WriteLog("E : Exception CaseChange() : ", e.Message);
+                Program.log.WriteLog("[E] : Exception CaseChange() : ", e.Message+e.StackTrace);
             }
         }
 
@@ -220,7 +220,7 @@ namespace BatchRenamer {
                 }
             }
             catch (Exception e) {
-                Program.log.WriteLog("E : Exception ExtensionChange() : ", e.Message);
+                Program.log.WriteLog("[E] : Exception ExtensionChange() : ", e.Message+e.StackTrace);
             }
         }
 
@@ -243,7 +243,7 @@ namespace BatchRenamer {
             Program.isWarning = true;
             Console.BackgroundColor = ConsoleColor.Yellow;
             Console.ForegroundColor = ConsoleColor.Black;
-            Program.log.WriteLog($"W: {String.Format(Program.res.Get("existingFileError"), _fileName, _finalName)}");
+            Program.log.WriteLog($"[W]: {String.Format(Program.res.Get("existingFileError"), _fileName, _finalName)}");
             Console.WriteLine(Program.res.Get("existingFileError"), _fileName, _finalName);
             Console.ResetColor();
         }

@@ -139,4 +139,6 @@
     End of program, see errors log in the folder : {0}
   </endErr>
   <exitRestart>Press enter to exit, or '1' to restart</exitRestart>
+  <argError>Argument error, verify syntax</argError>
+  <incorrectValue>Incorrect value</incorrectValue>
 </xml>

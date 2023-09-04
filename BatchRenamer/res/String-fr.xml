@@ -139,4 +139,6 @@
     Fin de programme, voir le log des erreurs dans le dossier : {0}
   </endErr>
   <exitRestart>Appuyez sur entrer pour quitter, ou '1' pour recommencer</exitRestart>
+  <argError>Erreur d'argument, vérifiez la syntaxe</argError>
+  <incorrectValue>Valeur incorrecte</incorrectValue>
 </xml>
