@@ -1,7 +1,7 @@
 # BatchRenamer
 Permit to batch rename folders or files.
 
-#EN
+# EN
 ## Usages
 ### Step by step
 Will guide you through the process and ask for validation.
@@ -52,7 +52,7 @@ Completely rename the files/folders.
 
 
 
-#FR
+# FR
 ## Utilisation
 ### Pas a pas
 Guide a travers le processus et demande validation.
